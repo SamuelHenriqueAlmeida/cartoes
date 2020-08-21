@@ -2,9 +2,9 @@ package com.cartoes.api.entities;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+//import java.util.List;
 
-import javax.persistence.CascadeType;
+//import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,11 +12,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+//import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+//import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "transacao")
@@ -100,6 +102,24 @@ public class Transacao implements Serializable {
 
 		public void setCartao(Cartao cartao) {
 			this.cartao = cartao;
+		}
+		
+		
+		@PreUpdate
+	    public void preUpdate() {
+	        dataTransacao = new Date();
+	    }
+
+	    @PrePersist
+	    public void prePersist() {
+	        dataTransacao = new Date();
+	    }
+		
+		@Override
+		public String toString() {
+			return "Transacao[" + "id=" + id + "," + "dataTransacao=" + dataTransacao + "," + "cnpj=" + cnpj + ","
+					+ "valor=" + valor + "," + "qdtParcelas=" + qdtParcelas + "," + "juros=" + juros + ","
+					+ "cartao=" + cartao + "]";
 		}
 		
 		
