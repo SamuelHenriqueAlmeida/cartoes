@@ -24,38 +24,42 @@ import com.cartoes.api.utils.ConsistenciaException;
 @RequestMapping("/api/transacao")
 @CrossOrigin(origins = "*")
 public class TransacaoController {
-    private static final Logger log = LoggerFactory.getLogger(TransacaoController.class);
+	private static final Logger log = LoggerFactory.getLogger(TransacaoController.class);
 
-    @Autowired
-    private TransacaoService transacaoService;
+	@Autowired
+	private TransacaoService transacaoService;
 
-    @GetMapping(value = "{cartaoId}")
-    public ResponseEntity<List<Transacao>> buscarTransacoes(@PathVariable("cartaoId") int cartaoId) {
-        try {
-            log.info("Controller: buscando transações por cartão de ID: {}", cartaoId);
-            Optional<List<Transacao>> listaCartoes = transacaoService.buscarTransacoes(cartaoId);
-            return ResponseEntity.ok(listaCartoes.get());
-        } catch (ConsistenciaException e) {
-            log.info("Controller: Inconsistência de dados: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(new ArrayList<Transacao>());
-        } catch (Exception e) {
-            log.error("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
-            return ResponseEntity.status(500).body(new ArrayList<Transacao>());
-        }
-    }
-    @PostMapping
-    public ResponseEntity<Transacao> salvar(@RequestBody Transacao transacao) {
-        try {
-            log.info("Controller: salvando a transação: {}", transacao.toString());
+	@GetMapping(value = "/cartao/{numeroCartao}")
+	public ResponseEntity<List<Transacao>> buscarPorNumeroCartao(@PathVariable("numeroCartao") String numeroCartao) {
 
-            return ResponseEntity.ok(this.transacaoService.salvar(transacao));
-        } catch (ConsistenciaException e) {
-            log.info("Controller: Inconsistência de dados: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(new Transacao());
-        } catch (Exception e) {
-            log.error("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
-            return ResponseEntity.status(500).body(new Transacao());
-        }
-    }
+		try {
+			Optional<List<Transacao>> listaTransacao = transacaoService.buscarPorNumeroCartao(numeroCartao);
+
+			return ResponseEntity.ok(listaTransacao.get());
+
+		} catch (ConsistenciaException e) {
+			log.info("Controller: Inconsistência de dados: {}", e.getMessage());
+			return ResponseEntity.badRequest().body(new ArrayList<Transacao>());
+		} catch (Exception e) {
+			log.error("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
+			return ResponseEntity.status(500).body(new ArrayList<Transacao>());
+		}
+	}
+
+	@PostMapping
+	public ResponseEntity<Transacao> salvar(@RequestBody Transacao transacao) {
+		try {
+
+			log.info("Controller: salvando a transação: {}", transacao.toString());
+
+			return ResponseEntity.ok(transacaoService.salvar(transacao));
+
+		} catch (ConsistenciaException e) {
+			log.info("Controller: Inconsistência de dados: {}", e.getMessage());
+			return ResponseEntity.badRequest().body(new Transacao());
+		} catch (Exception e) {
+			log.error("Controller: Ocorreu um erro na aplicação: {}", e.getMessage());
+			return ResponseEntity.status(500).body(new Transacao());
+		}
+	}
 }
-
