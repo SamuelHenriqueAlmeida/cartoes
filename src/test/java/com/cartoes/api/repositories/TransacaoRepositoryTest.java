@@ -75,7 +75,8 @@ public class TransacaoRepositoryTest {
 	@Test
 	public void testFindByNumeroCartao() {
 
-		Optional<List<Transacao>> transacoes = transacaoRepository.findByNumeroCartao(transacaoTeste.getCartao().getNumero());
+		Optional<List<Transacao>> transacoes = transacaoRepository
+				.findByNumeroCartao(transacaoTeste.getCartao().getNumero());
 		
 		List<Transacao> transacao = transacoes.get();
 		

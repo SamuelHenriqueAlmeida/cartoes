@@ -1,47 +1,44 @@
 package com.cartoes.api.controllers;
 
+import java.util.List;
 import java.util.Optional;
-import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.cartoes.api.dtos.ClienteDto;
-import com.cartoes.api.entities.Cliente;
+import com.cartoes.api.dtos.RegraDto;
+import com.cartoes.api.entities.Regra;
 import com.cartoes.api.response.Response;
-import com.cartoes.api.services.ClienteService;
+import com.cartoes.api.services.RegraService;
 import com.cartoes.api.utils.ConsistenciaException;
 import com.cartoes.api.utils.ConversaoUtils;
 
 @RestController
-@RequestMapping("/api/cliente")
+@RequestMapping("/api/regra")
 @CrossOrigin(origins = "*")
-public class ClienteController {
-	private static final Logger log = LoggerFactory.getLogger(ClienteController.class);
+public class RegraController {
+	private static final Logger log = LoggerFactory.getLogger(RegraController.class);
 	@Autowired
-	private ClienteService clienteService;
+	private RegraService regraService;
 
 	/**
-	 * Retorna os dados de um cliente a partir do seu id
+	 * Retorna os dados de uma regra a partir do id informado
 	 *
-	 * @param Id do cliente
-	 * @return Dados do cliente
+	 * @param Id da regra
+	 * @return Dados da regra
 	 */
 	@GetMapping(value = "/{id}")
-	public ResponseEntity<Response<ClienteDto>> buscarPorId(@PathVariable("id") int id) {
-		Response<ClienteDto> response = new Response<ClienteDto>();
+	public ResponseEntity<Response<RegraDto>> buscarPorId(@PathVariable("id") int id) {
+		Response<RegraDto> response = new Response<RegraDto>();
 		try {
-			log.info("Controller: buscando cliente com id: {}", id);
-			Optional<Cliente> cliente = clienteService.buscarPorId(id);
-			response.setDados(ConversaoUtils.Converter(cliente.get()));
+			log.info("Controller: buscando Regra com id: {}", id);
+			Optional<Regra> regra = regraService.buscarPorId(id);
+			response.setDados(ConversaoUtils.Converter(regra.get()));
 			return ResponseEntity.ok(response);
 		} catch (ConsistenciaException e) {
 			log.info("Controller: Inconsistência de dados: {}", e.getMessage());
@@ -55,18 +52,18 @@ public class ClienteController {
 	}
 
 	/**
-	 * Retorna os dados de um cliente a partir do CPF informado
+	 * Retorna os dados de uma regra a partir do nome informado
 	 *
-	 * @param Cpf do cliente
-	 * @return Dados do cliente
+	 * @param Nome da regra
+	 * @return Dados da regra
 	 */
-	@GetMapping(value = "/cpf/{cpf}")
-	public ResponseEntity<Response<ClienteDto>> buscarPorCpf(@PathVariable("cpf") String cpf) {
-		Response<ClienteDto> response = new Response<ClienteDto>();
+	@GetMapping(value = "/nome/{nome}")
+	public ResponseEntity<Response<RegraDto>> buscarPorNome(@PathVariable("nome") String nome) {
+		Response<RegraDto> response = new Response<RegraDto>();
 		try {
-			log.info("Controller: buscando cliente por CPF: {}", cpf);
-			Optional<Cliente> cliente = clienteService.buscarPorCpf(cpf);
-			response.setDados(ConversaoUtils.Converter(cliente.get()));
+			log.info("Controller: buscando Regra com nome: {}", nome);
+			Optional<Regra> regra = regraService.buscarPorNome(nome);
+			response.setDados(ConversaoUtils.Converter(regra.get()));
 			return ResponseEntity.ok(response);
 		} catch (ConsistenciaException e) {
 			log.info("Controller: Inconsistência de dados: {}", e.getMessage());
@@ -80,27 +77,17 @@ public class ClienteController {
 	}
 
 	/**
-	 * Persiste um cliente na base.
+	 * Retorna os dados de todas as regras cadastradas
 	 *
-	 * @param Dados de entrada do cliente
-	 * @return Dados do cliente persistido
+	 * @return Lista de regras cadastradas
 	 */
-
-	@PostMapping
-	public ResponseEntity<Response<ClienteDto>> salvar(@Valid @RequestBody ClienteDto clienteDto,
-			BindingResult result) {
-		Response<ClienteDto> response = new Response<ClienteDto>();
+	@GetMapping(value = "/todas")
+	public ResponseEntity<Response<List<RegraDto>>> buscarTodasAsRegras() {
+		Response<List<RegraDto>> response = new Response<List<RegraDto>>();
 		try {
-			log.info("Controller: salvando o cliente: {}", clienteDto.toString());
-			if (result.hasErrors()) {
-				for (int i = 0; i < result.getErrorCount(); i++) {
-					response.adicionarErro(result.getAllErrors().get(i).getDefaultMessage());
-				}
-				log.info("Controller: Os campos obrigatórios não foram preenchidos");
-				return ResponseEntity.badRequest().body(response);
-			}
-			Cliente cliente = this.clienteService.salvar(ConversaoUtils.Converter(clienteDto));
-			response.setDados(ConversaoUtils.Converter(cliente));
+			log.info("Controller: buscando todas as regras");
+			Optional<List<Regra>> regras = regraService.buscarTodasAsRegras();
+			response.setDados(ConversaoUtils.Converter(regras.get()));
 			return ResponseEntity.ok(response);
 		} catch (ConsistenciaException e) {
 			log.info("Controller: Inconsistência de dados: {}", e.getMessage());
